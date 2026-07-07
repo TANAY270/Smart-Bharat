@@ -38,30 +38,7 @@
   --font-mono: 'IBM Plex Mono', monospace;
 }
 
-/* Dark Mode Tokens Override */
-body.dark-mode {
-  --primary-light: hsl(var(--primary-hue), 85%, 15%);
-  --ink: hsl(var(--secondary-hue), 35%, 92%);
-  --ink-muted: hsl(var(--secondary-hue), 15%, 70%);
-  --paper: hsl(var(--secondary-hue), 40%, 8%);
-  --line: hsl(var(--secondary-hue), 30%, 18%);
-  --card: hsl(var(--secondary-hue), 35%, 12%);
-  --card-hover: hsl(var(--secondary-hue), 30%, 16%);
-  
-  --green: hsl(var(--success-hue), 70%, 45%);
-  --green-light: hsl(var(--success-hue), 70%, 12%);
-  --green-border: hsl(var(--success-hue), 50%, 40%);
-  
-  --yellow: hsl(var(--warning-hue), 85%, 55%);
-  --yellow-light: hsl(var(--warning-hue), 85%, 14%);
-  
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 16px 36px rgba(0, 0, 0, 0.5);
-  
-  background-color: var(--paper);
-  color: var(--ink);
-}
+/* Primary light theme values */
 
 /* GENERAL STYLING */
 * {
@@ -81,39 +58,70 @@ html, body {
 
 .app {
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
-  max-width: 1400px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
   background: var(--paper);
-  box-shadow: 0 0 40px rgba(0,0,0,0.03);
-  border-left: 1px solid var(--line);
-  border-right: 1px solid var(--line);
 }
 
-/* SIDEBAR */
-.sidebar {
-  width: 260px;
-  flex-shrink: 0;
-  border-right: 1px solid var(--line);
-  padding: 24px 16px;
+/* TOP NAVIGATION HEADER */
+.app-header {
+  width: 100%;
+  border-bottom: 1px solid var(--line);
+  background: var(--card);
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  background: var(--card);
-  transition: var(--transition);
   position: sticky;
   top: 0;
-  height: 100vh;
   z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 40px;
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.header-bottom {
+  padding: 6px 40px;
+  background: var(--card);
+}
+
+.utilities-group {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.utility-block {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.utility-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-muted);
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0 12px 24px 12px;
-  border-bottom: 1px solid var(--line);
-  margin-bottom: 16px;
+  padding: 0;
+  border-bottom: none;
+  margin-bottom: 0;
 }
 
 .brand-mark {
@@ -129,9 +137,7 @@ html, body {
   transition: var(--transition);
 }
 
-body.dark-mode .brand-mark {
-  background: var(--primary);
-}
+/* Removed dark-mode brand override */
 
 .brand-name {
   font-family: var(--font-serif);
@@ -152,8 +158,9 @@ body.dark-mode .brand-mark {
 
 .nav-group {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  flex-direction: row;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .nav-item {
@@ -262,8 +269,6 @@ body.dark-mode .brand-mark {
   flex: 1;
   min-width: 0;
   padding: 32px 40px 48px 40px;
-  overflow-y: auto;
-  height: 100vh;
 }
 
 .view {
@@ -323,10 +328,7 @@ p.page-sub {
   box-shadow: var(--shadow-md);
 }
 
-body.dark-mode .hero {
-  background: linear-gradient(135deg, hsl(var(--secondary-hue), 40%, 14%) 0%, hsl(var(--secondary-hue), 45%, 8%) 100%);
-  border: 1px solid var(--line);
-}
+/* Removed dark-mode hero override */
 
 .hero::after {
   content: "";
@@ -592,11 +594,7 @@ body.dark-mode .hero {
   border-bottom-right-radius: 3px;
 }
 
-body.dark-mode .msg.user {
-  background: var(--primary-light);
-  color: var(--ink);
-  border: 1px solid var(--line);
-}
+/* Removed dark-mode message overrides */
 
 .msg.bot {
   background: var(--card);
@@ -619,9 +617,7 @@ body.dark-mode .msg.user {
   color: var(--primary-deep);
 }
 
-body.dark-mode .msg.bot strong {
-  color: var(--primary);
-}
+/* Removed dark-mode strong overrides */
 
 .msg-meta {
   font-size: 10px;
@@ -1231,9 +1227,7 @@ canvas#wardMap {
   margin-top: 6px;
 }
 
-body.dark-mode .timeline-officer {
-  color: var(--primary);
-}
+/* Removed dark-mode timeline overrides */
 
 .timeline-actions {
   display: flex;
@@ -1500,42 +1494,69 @@ body.dark-mode .timeline-officer {
   }
 }
 
-/* RESPONSIVE DRAWER FOR MOBILE */
-@media (max-width: 900px) {
-  .app {
+/* RESPONSIVE LAYOUT FOR MOBILE HEADER */
+@media (max-width: 768px) {
+  .header-top {
     flex-direction: column;
+    align-items: flex-start;
+    padding: 12px 20px;
   }
-  .sidebar {
+  .header-bottom {
+    padding: 6px 20px;
+  }
+  .utilities-group {
     width: 100%;
-    height: auto;
-    position: relative;
-    border-right: none;
-    border-bottom: 1px solid var(--line);
-    padding: 16px;
-  }
-  .brand {
-    padding-bottom: 12px;
-    margin-bottom: 12px;
-  }
-  .nav-group {
-    flex-direction: row;
-    overflow-x: auto;
-    padding-bottom: 8px;
-    gap: 8px;
-  }
-  .nav-item {
-    white-space: nowrap;
-    padding: 8px 12px;
-  }
-  .nav-spacer {
-    display: none;
-  }
-  .sidebar-footer {
-    display: none;
+    justify-content: space-between;
   }
   .main {
     padding: 24px 20px;
-    height: auto;
-    overflow-y: visible;
   }
 }
+
+/* Accessibility Dynamic Typography Scaling */
+html {
+  --font-scale: 1;
+}
+body {
+  font-size: calc(14px * var(--font-scale)) !important;
+}
+.brand-name {
+  font-size: calc(20px * var(--font-scale)) !important;
+}
+.brand-sub {
+  font-size: calc(11px * var(--font-scale)) !important;
+}
+.nav-item {
+  font-size: calc(14px * var(--font-scale)) !important;
+}
+h1.page-title {
+  font-size: calc(32px * var(--font-scale)) !important;
+}
+p.page-sub {
+  font-size: calc(14.5px * var(--font-scale)) !important;
+}
+.hero h2 {
+  font-size: calc(28px * var(--font-scale)) !important;
+}
+.hero p {
+  font-size: calc(14.5px * var(--font-scale)) !important;
+}
+.svc-card h4 {
+  font-size: calc(16px * var(--font-scale)) !important;
+}
+.svc-card p {
+  font-size: calc(13px * var(--font-scale)) !important;
+}
+.msg {
+  font-size: calc(14px * var(--font-scale)) !important;
+}
+.field label {
+  font-size: calc(13px * var(--font-scale)) !important;
+}
+.field input, .field select, .field textarea {
+  font-size: calc(14px * var(--font-scale)) !important;
+}
+.btn-primary, .btn-ghost {
+  font-size: calc(14.5px * var(--font-scale)) !important;
+}
+

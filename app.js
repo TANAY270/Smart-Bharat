@@ -103,7 +103,26 @@ const DICT = {
     btnCancelSettings: "Cancel",
     btnSaveSettings: "Save Config",
     alertTitle: "Monsoon Water Drainage Drive (July 2026)",
-    alertDesc: "The Municipal Corporation is cleaning central drainage channels. Report any water logging using \"Report an Issue\" for immediate action."
+    alertDesc: "The Municipal Corporation is cleaning central drainage channels. Report any water logging using \"Report an Issue\" for immediate action.",
+    accessibilityLabel: "Text Accessibility",
+    analyticsLabel: "Municipal Analytics & Transparency Ledger",
+    lblResolutionRate: "Resolution Rate",
+    lblAvgTimeLabel: "Average Resolution Time",
+    lblActiveCrewsLabel: "Active Service Crews",
+    aiCategorySuggestion: "AI Suggested Category",
+    suggestedCategoryLabel: "AI Suggested Category:",
+    lblFeedbackTitle: "Rate Resolution Quality",
+    lblEscalateWarn: "Not satisfied with the execution? Escalate this file to the Commissioner Nodal Board for review.",
+    btnEscalateGrievance: "Escalate Case",
+    categoryLabels: {
+      'Roads & Potholes': 'Roads & Potholes',
+      'Streetlights': 'Streetlights',
+      'Garbage & Sanitation': 'Garbage & Sanitation',
+      'Water Supply': 'Water & Leakages',
+      'Drainage': 'Drainage & Flooding',
+      'Public Nuisance': 'Public Nuisance',
+      'Other': 'Other'
+    }
   },
   hi: {
     brandSub: "नागरिक सहायक",
@@ -187,7 +206,26 @@ const DICT = {
     btnCancelSettings: "रद्द करें",
     btnSaveSettings: "सेटिंग्स सहेजें",
     alertTitle: "मानसून जल निकासी अभियान (जुलाई 2026)",
-    alertDesc: "नगर निगम द्वारा मुख्य जल निकासी नालों की सफाई की जा रही है। तत्काल कार्रवाई के लिए \"शिकायत दर्ज करें\" का उपयोग करके जलभराव की रिपोर्ट करें।"
+    alertDesc: "नगर निगम द्वारा मुख्य जल निकासी नालों की सफाई की जा रही है। तत्काल कार्रवाई के लिए \"शिकायत दर्ज करें\" का उपयोग करके जलभराव की रिपोर्ट करें।",
+    accessibilityLabel: "पाठ पहुँच क्षमता",
+    analyticsLabel: "नगर निगम विश्लेषिकी और पारदर्शिता बहीखाता",
+    lblResolutionRate: "निवारण दर",
+    lblAvgTimeLabel: "औसत निवारण समय",
+    lblActiveCrewsLabel: "सक्रिय सेवा दल",
+    aiCategorySuggestion: "AI सुझाया गया वर्ग",
+    suggestedCategoryLabel: "AI सुझाया गया वर्ग:",
+    lblFeedbackTitle: "निवारण गुणवत्ता का मूल्यांकन करें",
+    lblEscalateWarn: "कार्यवाही से संतुष्ट नहीं हैं? वरिष्ठ समीक्षा के लिए इस फ़ाइल को आयुक्त नोडल बोर्ड को अग्रेषित करें।",
+    btnEscalateGrievance: "मामला अग्रेषित करें",
+    categoryLabels: {
+      'Roads & Potholes': 'सड़क और गड्ढे',
+      'Streetlights': 'स्ट्रीटलाइट्स',
+      'Garbage & Sanitation': 'कचरा और स्वच्छता',
+      'Water Supply': 'जल और रिसाव',
+      'Drainage': 'जल निकासी और बाढ़',
+      'Public Nuisance': 'सार्वजनिक उपद्रव',
+      'Other': 'अन्य'
+    }
   }
 };
 
@@ -540,7 +578,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     localStorage.setItem('sb_complaints', JSON.stringify(state.complaints));
   }
 
-  initTheme();
+  initAccessibility();
   applyLang();
   initNavigation();
   initSettingsModal();
@@ -557,35 +595,39 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ----------------------------------------------------
 // THEME & STYLES SYSTEM
 // ----------------------------------------------------
-function initTheme() {
-  const savedTheme = localStorage.getItem('sb_theme') || 'light';
-  state.theme = savedTheme;
-  document.body.classList.toggle('dark-mode', savedTheme === 'dark');
-  updateThemeUI();
+/* Theme manager removed */
 
-  document.getElementById('themeToggleBtn').addEventListener('click', () => {
-    state.theme = state.theme === 'light' ? 'dark' : 'light';
-    localStorage.setItem('sb_theme', state.theme);
-    document.body.classList.toggle('dark-mode', state.theme === 'dark');
-    updateThemeUI();
-    // Redraw map with theme colors
-    renderWardMap();
-  });
-}
+function initAccessibility() {
+  const incBtn = document.getElementById('fontIncBtn');
+  const resetBtn = document.getElementById('fontResetBtn');
+  const decBtn = document.getElementById('fontDecBtn');
 
-function updateThemeUI() {
-  const btn = document.getElementById('themeToggleBtn');
-  const icon = btn.querySelector('.theme-icon');
-  const text = document.getElementById('themeText');
-  const d = DICT[state.currentLang];
-
-  if (state.theme === 'dark') {
-    icon.textContent = '☀️';
-    text.textContent = d.themeTextLight || 'Light Mode';
-  } else {
-    icon.textContent = '🌙';
-    text.textContent = d.themeTextDark || 'Dark Mode';
+  if (!state.fontSizeScale) {
+    state.fontSizeScale = 100;
   }
+
+  const updateFontSize = () => {
+    document.documentElement.style.setProperty('--font-scale', state.fontSizeScale / 100);
+  };
+
+  incBtn.addEventListener('click', () => {
+    if (state.fontSizeScale < 130) {
+      state.fontSizeScale += 10;
+      updateFontSize();
+    }
+  });
+
+  decBtn.addEventListener('click', () => {
+    if (state.fontSizeScale > 85) {
+      state.fontSizeScale -= 10;
+      updateFontSize();
+    }
+  });
+
+  resetBtn.addEventListener('click', () => {
+    state.fontSizeScale = 100;
+    updateFontSize();
+  });
 }
 
 // ----------------------------------------------------
@@ -697,7 +739,19 @@ function applyLang() {
   document.getElementById('btnCancelSettings').textContent = d.btnCancelSettings;
   document.getElementById('btnSaveSettings').textContent = d.btnSaveSettings;
 
-  updateThemeUI();
+  // Accessibility & Analytics localization bindings
+  document.getElementById('accessibilityLabel').textContent = d.accessibilityLabel;
+  document.getElementById('analyticsLabel').textContent = d.analyticsLabel;
+  document.getElementById('lblResolutionRate').textContent = state.currentLang === 'hi' ? '87.4%' : '87.4%';
+  document.getElementById('lblResRateLabel').textContent = d.lblResolutionRate;
+  document.getElementById('lblAvgTimeLabel').textContent = d.lblAvgTimeLabel;
+  document.getElementById('lblActiveCrewsLabel').textContent = d.lblActiveCrewsLabel;
+  document.getElementById('suggestedCategoryLabel').textContent = d.suggestedCategoryLabel;
+  document.getElementById('lblFeedbackTitle').textContent = d.lblFeedbackTitle;
+  document.getElementById('lblEscalateWarn').textContent = d.lblEscalateWarn;
+  document.getElementById('btnEscalateGrievance').textContent = d.btnEscalateGrievance;
+
+  // Map render and chips update
   renderPopularGrid();
   renderServicesGrid();
   renderTrackList();
@@ -1250,6 +1304,41 @@ Check progress in "Track Complaints" using the ID.
     formWrap.style.display = 'block';
     confirmWrap.style.display = 'none';
   });
+
+  // AI Auto-Categorizer based on description keyword matching
+  const descTextarea = document.getElementById('fDesc');
+  const categorySelect = document.getElementById('fCategory');
+  const aiSuggestionContainer = document.getElementById('aiCategorySuggestion');
+  const suggestedVal = document.getElementById('suggestedCategoryValue');
+
+  descTextarea.addEventListener('input', () => {
+    const text = descTextarea.value.toLowerCase();
+    let category = '';
+
+    if (text.includes('wire') || text.includes('dark') || text.includes('light') || text.includes('pole') || text.includes('bulb') || text.includes('खंभा') || text.includes('बिजली') || text.includes('अंधेरा')) {
+      category = 'Streetlights';
+    } else if (text.includes('road') || text.includes('pothole') || text.includes('asphalt') || text.includes('hole') || text.includes('ditch') || text.includes('sarak') || text.includes('सड़क') || text.includes('गड्ढा')) {
+      category = 'Roads & Potholes';
+    } else if (text.includes('garbage') || text.includes('trash') || text.includes('sanitation') || text.includes('waste') || text.includes('litter') || text.includes('smell') || text.includes('dump') || text.includes('कचरा') || text.includes('गंदगी') || text.includes('सफाई')) {
+      category = 'Garbage & Sanitation';
+    } else if (text.includes('leak') || text.includes('pipe') || text.includes('water') || text.includes('tap') || text.includes('sewage') || text.includes('पानी') || text.includes('पाइप') || text.includes('निकास')) {
+      category = 'Water Supply';
+    } else if (text.includes('drain') || text.includes('flood') || text.includes('clog') || text.includes('channel') || text.includes('नाला') || text.includes('बाढ़') || text.includes('जलभराव')) {
+      category = 'Drainage';
+    } else if (text.includes('noise') || text.includes('nuisance') || text.includes('loud') || text.includes('music') || text.includes('illegal') || text.includes('शोर') || text.includes('पार्क') || text.includes('अवैध')) {
+      category = 'Public Nuisance';
+    }
+
+    if (category) {
+      categorySelect.value = category;
+      aiSuggestionContainer.style.display = 'flex';
+      suggestedVal.textContent = state.currentLang === 'hi'
+        ? (DICT.hi.categoryLabels[category] || category)
+        : category;
+    } else {
+      aiSuggestionContainer.style.display = 'none';
+    }
+  });
 }
 
 // ----------------------------------------------------
@@ -1337,6 +1426,79 @@ function initTracker() {
   document.getElementById('btnFilterSubmitted').onclick = () => renderTrackList(null, 'submitted');
   document.getElementById('btnFilterProgress').onclick = () => renderTrackList(null, 'progress');
   document.getElementById('btnFilterResolved').onclick = () => renderTrackList(null, 'resolved');
+
+  // Ratings Star Clicks binding inside Nodal Track Timeline
+  const ratingStars = document.getElementById('timelineStarRating');
+  ratingStars.addEventListener('click', e => {
+    const starSpan = e.target.closest('span');
+    if (!starSpan) return;
+
+    const ratingVal = parseInt(starSpan.dataset.star);
+    const activeId = state.selectedComplaintId;
+    if (!activeId) return;
+
+    const idx = state.complaints.findIndex(c => c.fileNo === activeId);
+    if (idx === -1) return;
+
+    const active = state.complaints[idx];
+    active.rating = ratingVal;
+
+    // Save state
+    state.complaints[idx] = active;
+    localStorage.setItem('sb_complaints', JSON.stringify(state.complaints));
+
+    // Update visual stars UI
+    const stars = ratingStars.querySelectorAll('span');
+    stars.forEach((s, i) => {
+      s.textContent = (i < ratingVal) ? '★' : '☆';
+    });
+
+    const escalationPanel = document.getElementById('escalationPanel');
+    if (ratingVal <= 2 && !active.escalated) {
+      escalationPanel.style.display = 'block';
+    } else {
+      escalationPanel.style.display = 'none';
+    }
+  });
+
+  // Escalation request triggers
+  const escalateBtn = document.getElementById('btnEscalateGrievance');
+  escalateBtn.addEventListener('click', () => {
+    const activeId = state.selectedComplaintId;
+    if (!activeId) return;
+
+    const idx = state.complaints.findIndex(c => c.fileNo === activeId);
+    if (idx === -1) return;
+
+    const active = state.complaints[idx];
+    if (active.escalated) return;
+
+    active.escalated = true;
+    active.status = 'progress'; // Re-opens the case
+    
+    const nowStr = new Date().toISOString();
+    active.history.push({
+      status: 'progress',
+      date: nowStr,
+      desc: state.currentLang === 'hi'
+        ? 'शिकायत को वरिष्ठ आयुक्त ऑडिट बोर्ड को अग्रेषित कर फाइल को दोबारा सक्रिय कर दिया गया है।'
+        : 'File escalated to Senior Nodal Supervisor (Commissioner Nodal Board) for active audit review. Grievance re-opened.',
+      officer: 'Commissioner Auditor Board'
+    });
+
+    state.complaints[idx] = active;
+    localStorage.setItem('sb_complaints', JSON.stringify(state.complaints));
+
+    alert(state.currentLang === 'hi'
+      ? "शिकायत आयुक्त बोर्ड को अग्रेषित कर दी गई है और जांच पुनः शुरू हो गई है!"
+      : "The complaint has been escalated to the Commissioner Board and the inspection is re-opened!");
+
+    // Refresh UI
+    updateHomeCounters();
+    renderTrackList();
+    renderWardMap();
+    openTimelineViewer(active);
+  });
 }
 
 function renderTrackList(searchQuery = null, filter = 'all') {
@@ -1479,6 +1641,29 @@ function openTimelineViewer(c) {
   // Highlight pin location in Canvas Map
   state.selectedCoords = c.coords;
   renderWardMap();
+
+  // Handle Resolved rating & escalation display
+  const feedbackSec = document.getElementById('timelineFeedbackSection');
+  const ratingStars = document.getElementById('timelineStarRating');
+  const escalationPanel = document.getElementById('escalationPanel');
+
+  if (c.status === 'resolved') {
+    feedbackSec.style.display = 'block';
+    // Load existing rating if present
+    const stars = ratingStars.querySelectorAll('span');
+    stars.forEach((s, idx) => {
+      s.textContent = (c.rating && idx < c.rating) ? '★' : '☆';
+    });
+    
+    if (c.rating && c.rating <= 2 && !c.escalated) {
+      escalationPanel.style.display = 'block';
+    } else {
+      escalationPanel.style.display = 'none';
+    }
+  } else {
+    feedbackSec.style.display = 'none';
+    escalationPanel.style.display = 'none';
+  }
 }
 
 // ----------------------------------------------------
@@ -1493,12 +1678,11 @@ function renderWardMap() {
   const h = canvas.height = 220;
 
   // Detect Theme Colors dynamically
-  const isDark = document.body.classList.contains('dark-mode');
-  const colorBackground = isDark ? '#1a2336' : '#ffffff';
-  const colorGrid = isDark ? '#28344e' : '#f0eada';
-  const colorRoads = isDark ? '#222d42' : '#f5ebd9';
-  const colorBorder = isDark ? '#3d4d6e' : '#ddd6c9';
-  const colorLabels = isDark ? '#a2b4d4' : '#5c6b84';
+  const colorBackground = '#ffffff';
+  const colorGrid = '#f0eada';
+  const colorRoads = '#f5ebd9';
+  const colorBorder = '#ddd6c9';
+  const colorLabels = '#5c6b84';
   
   // Draw base layout canvas background
   ctx.fillStyle = colorBackground;
