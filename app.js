@@ -7,7 +7,7 @@ let state = {
   currentLang: 'en',
   theme: 'light',
   apiKey: localStorage.getItem('sb_gemini_api_key') || '',
-  apiModel: localStorage.getItem('sb_gemini_api_model') || 'gemini-2.5-flash',
+  apiModel: localStorage.getItem('sb_gemini_api_model') || 'gemini-1.5-flash',
   complaints: [],
   selectedComplaintId: null,
   activeView: 'home',
@@ -122,7 +122,13 @@ const DICT = {
       'Drainage': 'Drainage & Flooding',
       'Public Nuisance': 'Public Nuisance',
       'Other': 'Other'
-    }
+    },
+    footerTitle: "Smart Bharat Portal",
+    footerDesc: "An official Generative AI initiative of the Municipal Nodal Board to provide transparent, accessible, and digitally inclusive public services to every citizen.",
+    footerLabelInfo: "Information",
+    footerLabelSupport: "Support",
+    footerLabelGov: "Government Links",
+    footerCopyright: "© 2026 Municipal Corporation. All Rights Reserved."
   },
   hi: {
     brandSub: "नागरिक सहायक",
@@ -225,7 +231,13 @@ const DICT = {
       'Drainage': 'जल निकासी और बाढ़',
       'Public Nuisance': 'सार्वजनिक उपद्रव',
       'Other': 'अन्य'
-    }
+    },
+    footerTitle: "स्मार्ट भारत पोर्टल",
+    footerDesc: "प्रत्येक नागरिक को पारदर्शी, सुलभ और डिजिटल रूप से समावेशी सार्वजनिक सेवाएं प्रदान करने के लिए नगर निगम नोडल बोर्ड की एक आधिकारिक जनरेटिव एआई पहल।",
+    footerLabelInfo: "सूचना",
+    footerLabelSupport: "सहायता",
+    footerLabelGov: "सरकारी वेबसाइटें",
+    footerCopyright: "© 2026 नगर निगम। सर्वाधिकार सुरक्षित।"
   }
 };
 
@@ -565,6 +577,12 @@ function generateStructuredServiceText(t, lang) {
 // INITIALIZATION & EVENT BINDINGS
 // ----------------------------------------------------
 document.addEventListener('DOMContentLoaded', async () => {
+  // Correct model selection versions mapping if saved key exists
+  if (state.apiModel && (state.apiModel.includes('2.5-flash') || state.apiModel.includes('2.5-pro'))) {
+    state.apiModel = 'gemini-1.5-flash';
+    localStorage.setItem('sb_gemini_api_model', 'gemini-1.5-flash');
+  }
+
   // Load complaints from localStorage or initialize with defaults
   const stored = localStorage.getItem('sb_complaints');
   if (stored) {
@@ -587,6 +605,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initTracker();
   initServicesDirectory();
   initDocHelper();
+  initFooterLinks();
   
   // Render map on startup
   renderWardMap();
@@ -750,6 +769,20 @@ function applyLang() {
   document.getElementById('lblFeedbackTitle').textContent = d.lblFeedbackTitle;
   document.getElementById('lblEscalateWarn').textContent = d.lblEscalateWarn;
   document.getElementById('btnEscalateGrievance').textContent = d.btnEscalateGrievance;
+
+  // Footer localized bindings
+  document.getElementById('footerTitle').textContent = d.footerTitle;
+  document.getElementById('footerDesc').textContent = d.footerDesc;
+  document.getElementById('footerLabelInfo').textContent = d.footerLabelInfo;
+  document.getElementById('footerLabelSupport').textContent = d.footerLabelSupport;
+  document.getElementById('footerLabelGov').textContent = d.footerLabelGov;
+  document.getElementById('footerCopyright').textContent = d.footerCopyright;
+
+  document.getElementById('footerLinkAbout').textContent = state.currentLang === 'hi' ? 'हमारे बारे में' : 'About Us';
+  document.getElementById('footerLinkContact').textContent = state.currentLang === 'hi' ? 'संपर्क करें' : 'Contact Us';
+  document.getElementById('footerLinkFeedback').textContent = state.currentLang === 'hi' ? 'प्रतिक्रिया' : 'Feedback';
+  document.getElementById('footerLinkFaqs').textContent = state.currentLang === 'hi' ? 'अक्सर पूछे जाने वाले प्रश्न' : 'FAQs';
+  document.getElementById('footerLinkHelp').textContent = state.currentLang === 'hi' ? 'सहायता एवं दिशा-निर्देश' : 'Help & Guidelines';
 
   // Map render and chips update
   renderPopularGrid();
@@ -2172,4 +2205,202 @@ function updateHomeCounters() {
   const rEl = document.getElementById('statResolved');
   if (oEl) oEl.textContent = openCount;
   if (rEl) rEl.textContent = resolvedCount;
+}
+
+function initFooterLinks() {
+  const modal = document.getElementById('infoModal');
+  const closeBtn = document.getElementById('closeInfoModal');
+  const title = document.getElementById('infoModalTitle');
+  const body = document.getElementById('infoModalBody');
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      modal.classList.remove('active');
+    });
+  }
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.classList.remove('active');
+    }
+  });
+
+  const showModal = (modalTitle, modalHtml) => {
+    title.textContent = modalTitle;
+    body.innerHTML = modalHtml;
+    modal.classList.add('active');
+  };
+
+  document.getElementById('footerLinkAbout').addEventListener('click', (e) => {
+    e.preventDefault();
+    const isHi = state.currentLang === 'hi';
+    const modalTitle = isHi ? "हमारे बारे में" : "About Us";
+    const modalHtml = isHi 
+      ? `<p style="font-size: 14px; line-height: 1.6; color: var(--ink);"><strong>स्मार्ट भारत नागरिक सहायक पोर्टल</strong> में आपका स्वागत है।</p>
+         <p style="font-size: 13.5px; line-height: 1.6; color: var(--ink-muted); margin-top: 12px;">
+           यह मंच एक एकीकृत नागरिक पोर्टल है जो एआई-संचालित सहायकों और डिजिटल ग्राइवेंस टूल का उपयोग करके नगर निगम के प्रशासनिक कार्यों को सरल बनाता है।
+         </p>
+         <p style="font-size: 13.5px; line-height: 1.6; color: var(--ink-muted); margin-top: 12px;">
+           हमारा लक्ष्य प्रत्येक भारतीय नागरिक को कुशल, उत्तरदायी और डिजिटल रूप से सुरक्षित तरीके से सार्वजनिक सेवाओं तक पहुंच प्रदान करना है।
+         </p>`
+      : `<p style="font-size: 14px; line-height: 1.6; color: var(--ink);">Welcome to the <strong>Smart Bharat Civic Companion Portal</strong>.</p>
+         <p style="font-size: 13.5px; line-height: 1.6; color: var(--ink-muted); margin-top: 12px;">
+           This platform is an official, AI-driven municipal workspace designed to simplify document workflows, expedite grievance filing, and bridge communication gaps between local government offices and municipal residents.
+         </p>
+         <p style="font-size: 13.5px; line-height: 1.6; color: var(--ink-muted); margin-top: 12px;">
+           Built with modern Generative AI technologies, we aim to ensure civic convenience, transparent service timelines, and high accessibility support.
+         </p>`;
+    showModal(modalTitle, modalHtml);
+  });
+
+  document.getElementById('footerLinkContact').addEventListener('click', (e) => {
+    e.preventDefault();
+    const isHi = state.currentLang === 'hi';
+    const modalTitle = isHi ? "संपर्क करें" : "Contact Us";
+    const modalHtml = isHi 
+      ? `<div style="line-height: 1.8; font-size: 14px; color: var(--ink);">
+           <p style="margin-bottom: 12px;">📞 <strong>नागरिक टोल-फ्री हेल्पलाइन:</strong> 1800-345-5678 (24x7 उपलब्ध)</p>
+           <p style="margin-bottom: 12px;">📧 <strong>आधिकारिक शिकायत ईमेल:</strong> support@smartbharat.gov.in</p>
+           <p style="margin-bottom: 12px;">🏢 <strong>केंद्रीय कार्यालय:</strong> नगर निगम भवन, विकास मार्ग, नई दिल्ली - 110001</p>
+           <hr style="border: none; border-top: 1px solid var(--line); margin: 16px 0;">
+           <p style="font-size: 12.5px; color: var(--ink-muted);">यदि आपको जलभराव, खराब सड़कों या स्ट्रीटलाइट से संबंधित शिकायत दर्ज करनी है, तो कृपया शीर्ष पर स्थित <strong>\"शिकायत दर्ज करें\"</strong> विकल्प का उपयोग करें।</p>
+         </div>`
+      : `<div style="line-height: 1.8; font-size: 14px; color: var(--ink);">
+           <p style="margin-bottom: 12px;">📞 <strong>Citizen Toll-Free Helpline:</strong> 1800-345-5678 (Available 24x7)</p>
+           <p style="margin-bottom: 12px;">📧 <strong>Official Grievance Desk:</strong> support@smartbharat.gov.in</p>
+           <p style="margin-bottom: 12px;">🏢 <strong>Central Office:</strong> Municipal Headquarters, Vikas Marg, New Delhi - 110001</p>
+           <hr style="border: none; border-top: 1px solid var(--line); margin: 16px 0;">
+           <p style="font-size: 12.5px; color: var(--ink-muted);">For issues relating to municipal repairs, please file an official request using the <strong>\"Report an Issue\"</strong> tab for direct coordination with ward staff.</p>
+         </div>`;
+    showModal(modalTitle, modalHtml);
+  });
+
+  document.getElementById('footerLinkFeedback').addEventListener('click', (e) => {
+    e.preventDefault();
+    const isHi = state.currentLang === 'hi';
+    const modalTitle = isHi ? "प्रतिक्रिया दें" : "Feedback";
+    const ratingLabel = isHi ? "हमारे पोर्टल को रेट करें:" : "Rate our portal:";
+    const commentLabel = isHi ? "अपनी टिप्पणियाँ लिखें (वैकल्पिक):" : "Add comments (optional):";
+    const placeholderText = isHi ? "कृपया अपना सुझाव साझा करें..." : "Share your experience with Sahayak AI...";
+    const submitText = isHi ? "फीडबैक भेजें" : "Submit Feedback";
+
+    const modalHtml = `
+      <form id="frmFeedback" class="feedback-form" style="display: flex; flex-direction: column; gap: 16px;">
+        <div>
+          <label style="font-weight: 600; font-size: 13px; display: block; margin-bottom: 8px; color: var(--ink);">${ratingLabel}</label>
+          <div class="feedback-stars" id="lblFeedbackStars" style="display: flex; gap: 8px; font-size: 28px; color: #ffbc00; cursor: pointer;">
+            <span data-val="1">☆</span>
+            <span data-val="2">☆</span>
+            <span data-val="3">☆</span>
+            <span data-val="4">☆</span>
+            <span data-val="5">☆</span>
+          </div>
+        </div>
+        <div>
+          <label style="font-weight: 600; font-size: 13px; display: block; margin-bottom: 8px; color: var(--ink);">${commentLabel}</label>
+          <textarea id="txtFeedbackComment" placeholder="${placeholderText}" rows="4" style="width: 100%; padding: 10px; border-radius: var(--radius-md); border: 1px solid var(--line); font-size: 13.5px; outline: none; resize: none; background: var(--card); color: var(--ink);"></textarea>
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%; padding: 12px; font-size: 14px; font-weight: 600;">${submitText}</button>
+      </form>
+    `;
+    showModal(modalTitle, modalHtml);
+
+    let selectedFeedbackRating = 0;
+    const stars = document.getElementById('lblFeedbackStars').querySelectorAll('span');
+    stars.forEach(s => {
+      s.addEventListener('click', () => {
+        selectedFeedbackRating = parseInt(s.dataset.val);
+        stars.forEach((star, idx) => {
+          star.textContent = (idx < selectedFeedbackRating) ? '★' : '☆';
+        });
+      });
+    });
+
+    document.getElementById('frmFeedback').addEventListener('submit', (evt) => {
+      evt.preventDefault();
+      alert(isHi 
+        ? "आपकी प्रतिक्रिया प्राप्त हुई। स्मार्ट भारत को बेहतर बनाने में सहायता के लिए धन्यवाद!" 
+        : "Thank you! Your feedback has been registered to help us improve the citizen companion.");
+      modal.classList.remove('active');
+    });
+  });
+
+  document.getElementById('footerLinkFaqs').addEventListener('click', (e) => {
+    e.preventDefault();
+    const isHi = state.currentLang === 'hi';
+    const modalTitle = isHi ? "अक्सर पूछे जाने वाले प्रश्न" : "FAQs";
+    
+    const faqs = isHi ? [
+      { q: "शिकायत का समाधान होने में कितना समय लगता है?", a: "सामान्य तौर पर, स्ट्रीटलाइट और कचरे की सफाई में 24-48 घंटे लगते हैं। सड़क की मरम्मत और जल निकासी से संबंधित समस्याओं के समाधान में 3-5 कार्य दिवस लग सकते हैं।" },
+      { q: "क्या मेरे द्वारा अपलोड किए गए दस्तावेज़ सुरक्षित हैं?", a: "हां। दस्तावेज़ सत्यापन लैब पूरी तरह से क्लाइंट-साइड काम करती है। आपकी फाइलें हमारे सर्वर पर अपलोड नहीं की जाती हैं, जिससे आपकी गोपनीयता बनी रहती है।" },
+      { q: "क्या मैं बिना इंटरनेट के भी सहायक का उपयोग कर सकता हूँ?", a: "हां, यदि आपके पास इंटरनेट नहीं है या आपके पास कोई एपीआई कुंजी नहीं है, तो पोर्टल स्वचालित रूप से हमारे स्थानीय बुद्धिमान एनएलपी सिमुलेटर का उपयोग करता है जो अधिकांश सामान्य नागरिक प्रश्नों का उत्तर दे सकता है।" }
+    ] : [
+      { q: "How long does it take for a grievance to get resolved?", a: "Typically, minor issues like streetlight bulb replacements or garbage sanitation sweeps take 24-48 hours. Major civic works like road pothole repairs or sewer main cleaning can take 3-5 working days." },
+      { q: "Are the documents uploaded to the Verification Lab secure?", a: "Yes, absolutely. The Document Verification Lab runs 100% locally on your browser. Your files are inspected client-side and are never uploaded or stored on any server." },
+      { q: "Can I use the Sahayak AI Companion without an internet connection?", a: "Yes, our offline keyword parser runs locally on the browser. If you don't have internet or haven't configured a Gemini API key, the simulator returns offline templates for Aadhaar, Voter cards, licensing, etc." }
+    ];
+
+    const modalHtml = `
+      <div class="info-accordion" style="display: flex; flex-direction: column; gap: 12px;">
+        ${faqs.map((f, i) => `
+          <div class="accordion-item" style="border: 1px solid var(--line); border-radius: var(--radius-md); overflow: hidden;">
+            <div class="accordion-header" data-idx="${i}" style="padding: 12px 16px; background: var(--paper); font-weight: 600; font-size: 13.5px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none;">
+              <span>${f.q}</span>
+              <span class="acc-chevron" style="transition: transform 0.2s;">▼</span>
+            </div>
+            <div class="accordion-body" id="acc-body-${i}" style="display: none; padding: 16px; font-size: 13px; line-height: 1.5; color: var(--ink-muted); border-top: 1px solid var(--line); background: var(--card);">
+              ${f.a}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    showModal(modalTitle, modalHtml);
+
+    const headers = body.querySelectorAll('.accordion-header');
+    headers.forEach(h => {
+      h.addEventListener('click', () => {
+        const idx = h.dataset.idx;
+        const b = document.getElementById(`acc-body-${idx}`);
+        const chevron = h.querySelector('.acc-chevron');
+        const isCollapsed = b.style.display === 'none';
+
+        body.querySelectorAll('.accordion-body').forEach(ab => ab.style.display = 'none');
+        body.querySelectorAll('.acc-chevron').forEach(cv => cv.style.transform = 'rotate(0deg)');
+
+        if (isCollapsed) {
+          b.style.display = 'block';
+          chevron.style.transform = 'rotate(180deg)';
+        }
+      });
+    });
+  });
+
+  document.getElementById('footerLinkHelp').addEventListener('click', (e) => {
+    e.preventDefault();
+    const isHi = state.currentLang === 'hi';
+    const modalTitle = isHi ? "सहायता एवं दिशा-निर्देश" : "Help & Guidelines";
+    const modalHtml = isHi
+      ? `<div style="font-size: 13.5px; line-height: 1.6; color: var(--ink);">
+           <h4 style="margin: 0 0 8px 0; font-size: 15px; font-family: var(--font-serif);">पोर्टल का उपयोग कैसे करें:</h4>
+           <ol style="padding-left: 20px; margin-bottom: 20px;">
+             <li style="margin-bottom: 8px;"><strong>सहायक एआई:</strong> वॉयस माइक बटन का उपयोग करके बोलकर या लिखकर सरकारी योजनाओं के बारे में जानकारी प्राप्त करें।</li>
+             <li style="margin-bottom: 8px;"><strong>शिकायत दर्ज करें:</strong> मानचित्र पर क्लिक करके सटीक स्थान चुनें, समस्या की फोटो अपलोड करें और तुरंत शिकायत दर्ज करें।</li>
+             <li style="margin-bottom: 8px;"><strong>दस्तावेज़ सहायक:</strong> योजना का नाम लिखें और दस्तावेज़ों को ड्रैग-एंड-ड्रॉप करके पात्रता की जांच करें।</li>
+           </ol>
+           <h4 style="margin: 0 0 8px 0; font-size: 15px; font-family: var(--font-serif);">एआई कुंजी कैसे कॉन्फ़िगर करें:</h4>
+           <p style="color: var(--ink-muted);">शीर्ष बार पर <strong>\"AI Config\"</strong> पर क्लिक करें, अपनी व्यक्तिगत जेमिनी एपीआई कुंजी दर्ज करें और सेटिंग्स सहेजें।</p>
+         </div>`
+      : `<div style="font-size: 13.5px; line-height: 1.6; color: var(--ink);">
+           <h4 style="margin: 0 0 8px 0; font-size: 15px; font-family: var(--font-serif);">How to Navigate the Portal:</h4>
+           <ol style="padding-left: 20px; margin-bottom: 20px;">
+             <li style="margin-bottom: 8px;"><strong>Sahayak AI Chat:</strong> Ask about services, schemes, and guidelines. Click the mic icon to dictate queries in English or Hindi.</li>
+             <li style="margin-bottom: 8px;"><strong>Report an Issue:</strong> Click directly on the vector map to register coordinates, drop a photo, and hit submit.</li>
+             <li style="margin-bottom: 8px;"><strong>Document Helper Lab:</strong> Search for services to verify if your files (e.g. ` + "`aadhaar.pdf`" + `) match the checklist rules.</li>
+           </ol>
+           <h4 style="margin: 0 0 8px 0; font-size: 15px; font-family: var(--font-serif);">Configuring Live AI Integration:</h4>
+           <p style="color: var(--ink-muted);">Click the <strong>\"AI Config\"</strong> button in the top utility bar, paste your Google Gemini API Key, and save. The app will immediately transition from simulator template fallback response structures to real-time generative responses.</p>
+         </div>`;
+    showModal(modalTitle, modalHtml);
+  });
 }
