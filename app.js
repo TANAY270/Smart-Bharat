@@ -1592,6 +1592,66 @@ function addMessage(text, role) {
   return wrapper;
 }
 
+function showTTSWarningToast(lang) {
+  if (document.getElementById('tts-warning-toast')) return;
+
+  const langNames = {
+    hi: 'Hindi (हिंदी)',
+    ta: 'Tamil (தமிழ்)',
+    bn: 'Bengali (বাংলা)'
+  };
+  const name = langNames[lang] || lang;
+  
+  const toast = document.createElement('div');
+  toast.id = 'tts-warning-toast';
+  toast.style.position = 'fixed';
+  toast.style.bottom = '20px';
+  toast.style.right = '20px';
+  toast.style.backgroundColor = 'var(--bg-card, #ffffff)';
+  toast.style.color = 'var(--ink, #1f2937)';
+  toast.style.borderLeft = '4px solid #f59e0b';
+  toast.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';
+  toast.style.padding = '12px 16px';
+  toast.style.borderRadius = 'var(--radius-sm, 6px)';
+  toast.style.fontSize = '12.5px';
+  toast.style.zIndex = '9999';
+  toast.style.maxWidth = '320px';
+  toast.style.lineHeight = '1.5';
+  toast.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+  toast.style.transform = 'translateY(20px)';
+  toast.style.opacity = '0';
+  
+  const content = {
+    hi: `⚠️ <strong>आवाज़ पैकेज अनुपलब्ध:</strong> आपके डिवाइस पर हिंदी आवाज़ पैक स्थापित नहीं है। Windows सेटिंग्स (Time & Language > Speech) में जाकर हिंदी स्पीच पैकेज स्थापित करें, या सुनिश्चित करें कि Brave ब्राउज़र फ़िंगरप्रिंटिंग सुरक्षा आवाज़ों को ब्लॉक नहीं कर रही है।`,
+    ta: `⚠️ <strong>குரல் தொகுப்பு கிடைக்கவில்லை:</strong> உங்கள் சாதனத்தில் தமிழ் குரல் தொகுப்பு நிறுவப்படவில்லை. விண்டோஸ் அமைப்புகளில் (Time & Language > Speech) தமிழ் ஸ்பீச் பேக்கேஜை நிறுவவும், அல்லது பிரேவ் (Brave) உலாவியின் பிங்கர்பிரிண்டிங் பாதுகாப்பு குரல்களைத் தடுக்கவில்லை என்பதை உறுதிப்படுத்தவும்.`,
+    bn: `⚠️ <strong>কণ্ঠস্বর উপলব্ধ নেই:</strong> আপনার ডিভাইসে বাংলা ভয়েস প্যাক ইনস্টল করা নেই। উইন্ডোজ সেটিংস (Time & Language > Speech) থেকে বাংলা স্পীচ প্যাকেজ ইনস্টল করুন, অথবা নিশ্চিত করুন যে Brave ব্রাউজারের ফিঙ্গারপ্রিন্টিং সুরক্ষা ভয়েস ব্লক করছে না।`
+  };
+
+  const text = content[lang] || `⚠️ <strong>Voice Pack Missing:</strong> The speech voice for ${name} is not installed on your system. To hear TTS in this language, please download the speech pack in your OS Speech Settings, or check if Brave browser fingerprinting shields are blocking speech synthesis.`;
+  
+  toast.innerHTML = `
+    <div style="display: flex; gap: 8px; align-items: flex-start;">
+      <div style="flex: 1;">${text}</div>
+      <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; cursor: pointer; padding: 0 4px; font-size: 16px; font-weight: bold; line-height: 1; color: var(--ink-muted, #6b7280);">×</button>
+    </div>
+  `;
+  
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.transform = 'translateY(0)';
+    toast.style.opacity = '1';
+  }, 10);
+  
+  setTimeout(() => {
+    if (toast.parentElement) {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(10px)';
+      setTimeout(() => toast.remove(), 500);
+    }
+  }, 8000);
+}
+
 function speakAloud(text) {
   if (!('speechSynthesis' in window)) return;
   
@@ -1615,6 +1675,9 @@ function speakAloud(text) {
   });
   if (matchingVoice) {
     synthesisUtterance.voice = matchingVoice;
+  } else if (state.currentLang !== 'en') {
+    console.warn(`[Smart Bharat] No TTS voice installed on your system for language: ${state.currentLang}. TTS may fallback to English.`);
+    showTTSWarningToast(state.currentLang);
   }
 
   window.speechSynthesis.speak(synthesisUtterance);
