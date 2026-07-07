@@ -1088,7 +1088,7 @@ async function handleSendMessage() {
       Rules:
       - Answer citizen questions about Indian government services (Aadhaar, PAN, Passport, Ration, Voter ID, Welfare Schemes, Municipal grievances, certificates).
       - Maintain standard administrative vocabulary. List clear application procedures, timelines, fees and essential document requirements.
-      - Answer in the user's primary writing language (English, Hindi, or Hinglish).
+      - The citizen's active portal language is currently: ${state.currentLang === 'hi' ? 'Hindi (हिंदी)' : 'English'}. You MUST formulate your entire response in ${state.currentLang === 'hi' ? 'Hindi (हिंदी)' : 'English'} only.
       - Give structured answers using lists and bold tags. Be direct and avoid technical legalese.`;
 
       const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/${state.apiModel}:generateContent?key=${state.apiKey}`, {
